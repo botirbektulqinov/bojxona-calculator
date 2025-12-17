@@ -95,6 +95,35 @@ python scripts/sync_incustoms.py
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
+**Qisqa eslatma — `PYTHONPATH` va Docker**
+
+- Agar skriptlarni yoki `alembic` buyruqlarini loyihaning `scripts/` papkasidan to'g'ridan-to'gri ishga tushirayotgan bo'lsangiz, Python paket yo'li (`app` paketi uchun) to'g'ri sozlangan bo'lishi kerak. Eng oddiy usul:
+
+```bash
+source .venv/bin/activate
+export PYTHONPATH="$(pwd)"
+alembic upgrade head
+PYTHONPATH=. python scripts/sync_incustoms.py
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+- Docker bilan ishlaganda eng qulay yo'l — reponi klon qilib `docker-compose` bilan ishga tushirish. Agar konteyner ichida `alembic` yoki boshqa buyruqlarni qo'lda bajarish kerak bo'lsa, quyidagicha qilasiz:
+
+```bash
+# Clone + start
+git clone <repository-url>
+cd bojxona-backend
+docker-compose up -d --build
+
+# Alembic migratsiyasini konteyner ichida ishga tushirish 
+docker compose exec web bash -lc "export PYTHONPATH=/app && alembic upgrade head"
+
+# Sinxron skriptni ishga tushirish (konteyner ichida)
+docker compose exec web bash -lc "export PYTHONPATH=/app && python scripts/sync_incustoms.py"
+
+# Keyin API ishlaydi: http://localhost:8000
+```
+
 Server muvaffaqiyatli ishga tushgandan so'ng:
 - API: http://localhost:8000
 - Interactive UI: http://localhost:8000/static/index.html

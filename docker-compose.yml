@@ -6,22 +6,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/customs_db
-    depends_on:
-      - db
+      - DATABASE_URL=sqlite+aiosqlite:///./customs_app.db
     volumes:
-      - .:/app
-
-  db:
-    image: postgres:15
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=customs_db
-    ports:
-      - "5432:5432"
-
-volumes:
-  postgres_data:
+      - ./customs_app.db:/app/customs_app.db
+      - ./data:/app/data
+    restart: unless-stopped
